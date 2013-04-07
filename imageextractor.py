@@ -6,7 +6,7 @@ from SimpleCV import *
 import urllib2
 
 def get_image(filename="tmp.jpg"):
-    url = "http://10.22.35.102:8090/?action=snapshot"
+    url = "http://10.22.34.181:8090/?action=snapshot"
     req = urllib2.urlopen(url)
     CHUNK = 300 * 1024
     with open(filename, 'wb') as fp:

@@ -16,6 +16,10 @@ def thresh(image):
     upper = target + thresh*full
     return Image(cv2.inRange(image.getNumpy(),lower,upper))
 
+def get_blob_s(image):
+    blobs = image.findBlobs()
+    return blobs
+
 def get_blob(image):
     blobs = image.findBlobs()
     if blobs:
