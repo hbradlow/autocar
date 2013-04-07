@@ -3,13 +3,27 @@ import socket
 import sys
 import tempfile
 from SimpleCV import *
-
+import urllib2
 
 def get_image(filename="tmp.jpg"):
+    url = "http://10.22.35.102:8090/?action=snapshot"
+    req = urllib2.urlopen(url)
+    CHUNK = 300 * 1024
+    with open(filename, 'wb') as fp:
+        while True:
+            chunk = req.read(CHUNK)
+            if not chunk: break
+            fp.write(chunk)
+            break
+    return filename
+
+def get_image_old(filename="tmp.jpg"):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("192.168.0.106", 8081))
+    s.connect(("192.168.0.105", 8090))
+#    s.send("GET /?action=stream HTTP/1.1\015\012Content-Type: text/html; charset=UTF-8  \015\012\015\012")
 
     fh = s.makefile()
+
 # Read in HTTP headers:
     line = fh.readline()
     boundary = ""
@@ -22,7 +36,8 @@ def get_image(filename="tmp.jpg"):
         line = fh.readline()
 
     if not boundary:
-        raise Exception("Can't find content-type")
+        pass
+        #raise Exception("Can't find content-type")
 
 # Seek ahead to the first chunk
     while line.strip() != boundary:
@@ -41,3 +56,6 @@ def get_image(filename="tmp.jpg"):
     t.write(image)
     t.close()
     return filename
+
+if __name__=="__main__":
+    get_image()

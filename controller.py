@@ -32,9 +32,27 @@ class Controller:
             self.control(left,distance)
 
     def control(self,left,distance):
+        return
         url = "https://agent.electricimp.com/Ywn0OQCdQZd6"
+
+        direction = "/right"
+        if left:
+            direction = "/left"
+
+        urllib.urlopen(url + direction)
+
         method = "/forward"
         urllib.urlopen(url + method)
+
+        urllib.urlopen(url + direction)
+
+frame_rate = 3
+
+def get_blobs():
+    c = Controller()
+    im = Image(get_image())
+    blob = c.process_image(im)
+    return blob
 
 if __name__=="__main__":
     while True:
@@ -48,4 +66,4 @@ if __name__=="__main__":
             im.addDrawingLayer(circlelayer)
             im.applyLayers()
             d = im.show()
-        time.sleep(3)
+        time.sleep(1.0/frame_rate)
