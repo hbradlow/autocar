@@ -3,17 +3,25 @@ import IPython
 from homography import *
 
 def thresh(image):
-    target = np.array([247,255,31])
+    #target = np.array([247,255,31])
+    #target = np.array([146,105,30])
+    #target = np.array([103,71,18])
+    #target = np.array([112,28,18])
+    #target = np.array([8.,78.,86.])
+    target = np.array([219,71,49])
     full = np.array([255,255,255])
-    thresh = .3
+    thresh = np.array([.2,.2,.2])
 
     lower = target - thresh*full
     upper = target + thresh*full
-    return Image(cv2.inRange(i.getNumpy(),lower,upper))
+    return Image(cv2.inRange(image.getNumpy(),lower,upper))
 
 def get_blob(image):
     blobs = image.findBlobs()
-    return (blobs[0].x,blobs[0].y)
+    if blobs:
+        blob = max(blobs,key=lambda b: b._mHeight*b._mWidth)
+        return (blob.x,blob.y)
+    return None
 
 def get_corners(input):
     blobs = input.findBlobs()
@@ -37,9 +45,10 @@ def find_goal(input):
 
 if __name__=="__main__":
     i = Image("test2.jpg")
-    IPython.embed()
     i_binary = thresh(i)
     blob = get_blob(i_binary)
+    i_binary.show()
+    IPython.embed()
 
     circlelayer = DrawingLayer((i.width, i.height))
     circlelayer.circle(blob, 10)

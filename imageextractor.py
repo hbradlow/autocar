@@ -1,22 +1,18 @@
 #!/usr/bin/env python
 import socket
 import sys
+import tempfile
+from SimpleCV import *
 
-if len(sys.argv) != 3:
-    print "Usage: %s host:port destfile.jpg" % sys.argv[0]
-    sys.exit(1)
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host, port = sys.argv[1].split(':')
-s.connect((host, int(port)))
+def get_image(filename="tmp.jpg"):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(("192.168.0.106", 8081))
 
-fh = s.makefile()
-
-i = 0
-while i < 10:
-    i += 1
+    fh = s.makefile()
 # Read in HTTP headers:
     line = fh.readline()
+    boundary = ""
     while line.strip() != '':
         parts = line.split(':')
         if len(parts) > 1 and parts[0].lower() == 'content-type':
@@ -41,11 +37,7 @@ while i < 10:
         line = fh.readline()
 
     image = fh.read(length)
-
-    print "got one frame"
-    """
-    with open(sys.argv[2] + str(i), 'w') as out_fh:
-        out_fh.write(image)
-        """
-
-s.close()
+    t = open(filename,"w")
+    t.write(image)
+    t.close()
+    return filename
