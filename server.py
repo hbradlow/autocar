@@ -68,4 +68,4 @@ def hello():
 
 if __name__ == "__main__":
     thread.start_new_thread(update,("a",))
-    app.run(host="10.22.34.218",port=8080)
+    app.run(host="10.22.34.6",port=8080)

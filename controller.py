@@ -11,6 +11,7 @@ frame_rate = 2.5
 class Controller:
     def __init__(self):
         self.width = 500
+        self.bwidth = 0
         self.height = 500
         self.lefts = []
         self.distances = []
@@ -45,7 +46,8 @@ class Controller:
         blobs = get_blob_s(i_binary)
         blob = None
         if blobs:
-            blobs = [[b.x,b.y] for b in blobs]
+            blobs = [[b.x,b.y,b._mWidth] for b in blobs]
+            self.bwidth = max(blobs,key=lambda b: b[2])[2]
             if self.object_left:
                 blob = min(blobs,key=lambda b: b[0])
             else:
@@ -65,9 +67,13 @@ class Controller:
 
             distance = 1-percent #TODO tune this
             self.distance = distance
+            print "WIDTHWIDTH:",self.bwidth
+            print 
+            print 
             if self.distance:
                 #if self.distance<.075:
-                if self.distance<.4:
+                if self.distance<.45:
+                #if self.bwidth>60:
                     self.down_counter += 1
             print "GOTO: ",left,distance
 
@@ -100,7 +106,7 @@ class Controller:
         method = "/forward"
         if back:
             method = "/back"
-        method += str((distance-.14)*.3)
+        method += str((distance-.14)*.5)
         print method
         try:
             urllib2.urlopen(url + method,timeout=to)
