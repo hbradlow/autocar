@@ -17,6 +17,7 @@ def update(s):
     global b
     while True:
         tmp = get_blobs()
+        print tmp
         if tmp:
             """
             for index,l in enumerate(tmp):

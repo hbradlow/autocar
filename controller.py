@@ -6,7 +6,7 @@ import time
 
 debug = True
 
-frame_rate = 2.0
+frame_rate = 2.5
 
 class Controller:
     def __init__(self):
@@ -26,7 +26,7 @@ class Controller:
 
     def is_high(self):
         if self.distance:
-            return self.down_counter<4
+            return self.down_counter<1
         return True
 
     def process_image_blobs(self,image):
@@ -67,7 +67,7 @@ class Controller:
             self.distance = distance
             if self.distance:
                 #if self.distance<.075:
-                if self.distance<.09:
+                if self.distance<.4:
                     self.down_counter += 1
             print "GOTO: ",left,distance
 
@@ -89,6 +89,7 @@ class Controller:
             print "STRAIGHT"
             direction = "/straight"
 
+        print direction
         try:
             urllib2.urlopen(url + direction,timeout=to)
         except:
@@ -99,7 +100,7 @@ class Controller:
         method = "/forward"
         if back:
             method = "/back"
-        method += str((distance+.04)*.8)
+        method += str((distance-.14)*.3)
         print method
         try:
             urllib2.urlopen(url + method,timeout=to)
@@ -130,7 +131,7 @@ def get_blobs():
     blobs = c.process_image_blobs(im)
     if blobs:
         #print [b._mWidth*b._mHeight for b in blobs]
-        r = [[b.x,b.y,b._mWidth*b._mHeight] for b in blobs if b._mWidth*b._mHeight>100]
+        r = [[b.x,b.y,b._mWidth*b._mHeight] for b in blobs if b._mWidth*b._mHeight>50]
         return r
     return None
 

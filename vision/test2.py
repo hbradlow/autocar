@@ -8,9 +8,11 @@ def thresh(image):
     #target = np.array([103,71,18])
     #target = np.array([112,28,18])
     #target = np.array([8.,78.,86.])
-    target = np.array([219,71,49])
+    #target = np.array([219,71,49])
+    #target = np.array([252,146,151])
+    target = np.array([237,91,108])
     full = np.array([255,255,255])
-    thresh = np.array([.2,.2,.2])
+    thresh = np.array([.15,.15,.15])
 
     lower = target - thresh*full
     upper = target + thresh*full
