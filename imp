@@ -1,0 +1,105 @@
+imp.configure("Car Imp", [], []);
+
+// configure the imp's hardware
+// pin 7 is a digital input (0 or 1) and is pulled up externally
+hardware.pin2.configure(DIGITAL_OUT);
+hardware.pin1.configure(DIGITAL_OUT);
+hardware.pin5.configure(DIGITAL_OUT);
+hardware.pin7.configure(DIGITAL_OUT);
+
+function forward() {
+    server.show("Button Pressed!");
+    local buttonState = hardware.pin2.read();
+    if (buttonState == 0) {
+        hardware.pin2.write(1);
+        server.show("Button Pressed!");
+    } else {
+        hardware.pin2.write(0);
+        server.show("Button Released!");
+    }
+}
+function back() {
+    local buttonState = hardware.pin1.read();
+    if (buttonState == 0) {
+        hardware.pin1.write(1);
+        server.show("Button Pressed!");
+    } else {
+        hardware.pin1.write(0);
+        server.show("Button Released!");
+    }
+}
+function left() {
+    local buttonState = hardware.pin5.read();
+    if (buttonState == 0) {
+        hardware.pin5.write(1);
+        server.show("Button Pressed!");
+    } else {
+        hardware.pin5.write(0);
+        server.show("Button Released!");
+    }
+}
+function right() {
+    local buttonState = hardware.pin7.read();
+    if (buttonState == 0) {
+        hardware.pin7.write(1);
+        server.show("Button Pressed!");
+    } else {
+        hardware.pin5.write(0);
+        server.show("Button Released!");
+    }
+}
+
+agent.on("forward", function(val) {
+    forward();
+    //sleep(1000);
+    forward();
+});
+agent.on("back", function(val){
+    back();
+    //sleep(1000);
+    back();
+});
+agent.on("right", function(val){
+    right();
+    //sleep(1000);
+    right();
+});
+agent.on("left", function(val){
+    left();
+    //sleep(1000);
+    left();
+});
+
+----------------------
+server.log("Car Agent started");
+// this function responds to http requests to the agent URL
+http.onrequest(function(request,res){
+    // regardless of response, we need the proper headers to allow cross-origin requests
+    // NOTE: You may want to set this field to allow only the domain you expect (and want to allow)
+    // requests from. 
+    res.header("Access-Control-Allow-Origin", "*");
+    // NOTE: if you're sending data cross-site, you won't even see your request body unless these headers 
+    // are set to allow your request in. The client-side will send a "preflight check" to test whether
+    // the agent will accept the request, and if not, request.body is going to come up empty
+    res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        
+    // new text-based message handler
+    if (request.path == "/forward") {
+        server.log("Agent got forward request");
+        device.send("forward", 0);
+    } 
+    else if (request.path == "/back") {
+        server.log("Agent got back request");
+        device.send("back", 0);
+    } 
+    else if (request.path == "/left") {
+        server.log("Agent got left request");
+        device.send("left", 0);
+    } 
+    else if (request.path == "/right") {
+        server.log("Agent got right request");
+        device.send("right", 0);
+    } 
+});
+
