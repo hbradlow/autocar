@@ -6,7 +6,7 @@ import time
 
 debug = True
 
-frame_rate = 1.5
+frame_rate = 2.0
 
 class Controller:
     def __init__(self):
@@ -16,6 +16,7 @@ class Controller:
         self.distances = []
         self.distance = None
         self.down_counter = 0
+        self.object_left = True
 
         url = "https://agent.electricimp.com/Ywn0OQCdQZd6"
         try:
@@ -25,7 +26,7 @@ class Controller:
 
     def is_high(self):
         if self.distance:
-            return self.down_counter<3
+            return self.down_counter<4
         return True
 
     def process_image_blobs(self,image):
@@ -41,7 +42,16 @@ class Controller:
         self.height = image.height
 
         i_binary = thresh(image)
-        blob = get_blob(i_binary)
+        blobs = get_blob_s(i_binary)
+        blob = None
+        if blobs:
+            blobs = [[b.x,b.y] for b in blobs]
+            if self.object_left:
+                blob = min(blobs,key=lambda b: b[0])
+            else:
+                blob = max(blobs,key=lambda b: b[0])
+
+        #blob = get_blob(i_binary)
         self.blob = blob
         return blob
 
@@ -56,6 +66,7 @@ class Controller:
             distance = 1-percent #TODO tune this
             self.distance = distance
             if self.distance:
+                #if self.distance<.075:
                 if self.distance<.09:
                     self.down_counter += 1
             print "GOTO: ",left,distance
@@ -70,23 +81,26 @@ class Controller:
         url = "https://agent.electricimp.com/Ywn0OQCdQZd6"
         to = .1
 
+        direction = "/right"
         if left != -1:
-            print "STRAIGHT"
-            direction = "/right"
             if left:
                 direction = "/left"
+        else:
+            print "STRAIGHT"
+            direction = "/straight"
 
-            try:
-                urllib2.urlopen(url + direction,timeout=to)
-            except:
-                pass
+        try:
+            urllib2.urlopen(url + direction,timeout=to)
+        except:
+            pass
 
-            time.sleep(.5/frame_rate)
+        time.sleep(.5/frame_rate)
 
         method = "/forward"
         if back:
             method = "/back"
-        method += str(distance*1.5)
+        method += str((distance+.04)*.8)
+        print method
         try:
             urllib2.urlopen(url + method,timeout=to)
         except:
@@ -114,8 +128,11 @@ def get_blobs():
     c = Controller()
     im = Image(get_image())
     blobs = c.process_image_blobs(im)
-    r = [[b.x,b.y] for b in blobs]
-    return r
+    if blobs:
+        #print [b._mWidth*b._mHeight for b in blobs]
+        r = [[b.x,b.y,b._mWidth*b._mHeight] for b in blobs if b._mWidth*b._mHeight>100]
+        return r
+    return None
 
 def get_blobs2():
     c = Controller()
@@ -130,8 +147,9 @@ def get_blobs2():
     return  None
 
 
-if __name__=="__main__":
+def run(left=True):
     c = Controller()
+    c.object_left = left
     while c.is_high():
         im = Image(get_image())
         blob = c.process_image(im)
@@ -147,3 +165,5 @@ if __name__=="__main__":
             im.applyLayers()
             d = im.show()
     c.go_back()
+if __name__=="__main__":
+    run()
